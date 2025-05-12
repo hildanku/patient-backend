@@ -6,10 +6,11 @@ use App\Models\Patient;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\ApiResponse;
 
 class PatientController extends Controller {
     public function index() {
-        return response()->json(Patient::with('user')->get());
+        return ApiResponse::success(Patient::with('user')->get());
     }
 
     public function store(Request $request) {
@@ -39,11 +40,11 @@ class PatientController extends Controller {
             'medium_acquisition' => $request->medium_acquisition
         ]);
 
-        return response()->json($patient->load('user'));
+        return ApiResponse::success($patient->load('user'), 'Patient created successfully', 201);
     }
 
     public function show($id) {
-        return response()->json(Patient::with('user')->findOrFail($id));
+        return ApiResponse::success(Patient::with('user')->findOrFail($id));
     }
 
     public function update(Request $request, $id) {
@@ -53,7 +54,7 @@ class PatientController extends Controller {
         $user->update($request->only(['name', 'id_type', 'id_no', 'gender', 'dob', 'address']));
         $patient->update($request->only(['medium_acquisition']));
 
-        return response()->json($patient->load('user'));
+        return ApiResponse::success($patient->load('user'), 'Patient updated successfully');
     }
 
     public function destroy($id) {
@@ -61,6 +62,6 @@ class PatientController extends Controller {
         $patient->user->delete();
         $patient->delete();
 
-        return response()->json(['message' => 'Deleted successfully']);
+        return ApiResponse::success(null, ['message' => 'Deleted successfully']);
     }
 }
