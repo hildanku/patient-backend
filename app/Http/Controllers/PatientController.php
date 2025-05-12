@@ -31,8 +31,6 @@ class PatientController extends Controller {
             'gender' => $request->gender,
             'dob' => $request->dob,
             'address' => $request->address,
-            'email' => uniqid().'@example.com',
-            'password' => bcrypt('password')
         ]);
 
         $patient = Patient::create([
