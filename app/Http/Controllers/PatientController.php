@@ -60,6 +60,6 @@ class PatientController extends Controller {
         $patient->user->delete();
         $patient->delete();
 
-        return ApiResponse::success(null, ['message' => 'Deleted successfully']);
+        return ApiResponse::success(null, 'Patient deleted successfully');
     }
 }
