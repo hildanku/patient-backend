@@ -7,6 +7,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\ApiResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PatientController extends Controller {
     public function index() {
@@ -36,21 +38,34 @@ class PatientController extends Controller {
 
         $validated = $validator->validated();
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'id_type' => $validated['id_type'],
-            'id_no' => $validated['id_no'],
-            'gender' => $validated['gender'],
-            'dob' => $validated['dob'],
-            'address' => $validated['address'],
-        ]);
-
-        $patient = Patient::create([
-            'user_id' => $user->id,
-            'medium_acquisition' => $validated['medium_acquisition'],
-        ]);
-
-        return ApiResponse::success($patient->load('user'), 'Patient created successfully', 201);
+        try {
+            $patient = \DB::transaction(function() use ($validated) {
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'id_type' => $validated['id_type'],
+                    'id_no' => $validated['id_no'],
+                    'gender' => $validated['gender'],
+                    'dob' => $validated['dob'],
+                    'address' => $validated['address'],
+                ]);
+                
+                $patient = Patient::create([
+                    'user_id' => $user->id,
+                    'medium_acquisition' => $validated['medium_acquisition'],
+                ]);
+                
+                $patient->load('user');
+                
+                return $patient;
+            });
+            
+            return ApiResponse::success($patient, 'Patient created successfully', 201);
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to create patient: ' . $e->getMessage());
+            
+            return ApiResponse::error(null, 'Failed to create patient: ' . $e->getMessage(), 500);
+        }
     }
 
     public function show($id) {
@@ -74,7 +89,7 @@ class PatientController extends Controller {
             return ApiResponse::error(null, 'User not found', 404);
         }
 
-    $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string',
             'id_type' => 'sometimes|required|string',
             'id_no' => 'sometimes|required|string',
@@ -90,17 +105,32 @@ class PatientController extends Controller {
 
         $validated = $validator->validated();
 
-        if (isset($validated['name']) || isset($validated['id_type']) || 
-            isset($validated['id_no']) || isset($validated['gender']) || 
-            isset($validated['dob']) || isset($validated['address'])) {
-            $user->update(array_intersect_key($validated, array_flip(['name', 'id_type', 'id_no', 'gender', 'dob', 'address'])));
+        try {
+            $updatedPatient = \DB::transaction(function() use ($validated, $patient, $user) {
+                $userFields = array_intersect_key($validated, array_flip([
+                    'name', 'id_type', 'id_no', 'gender', 'dob', 'address'
+                ]));
+                
+                if (!empty($userFields)) {
+                    $user->update($userFields);
+                }
+                
+                if (isset($validated['medium_acquisition'])) {
+                    $patient->update(['medium_acquisition' => $validated['medium_acquisition']]);
+                }
+                
+                $patient->refresh();
+                $patient->load('user');
+                
+                return $patient;
+            });
+            
+            return ApiResponse::success($updatedPatient, 'Patient updated successfully');
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to update patient: ' . $e->getMessage());
+            return ApiResponse::error(null, 'Failed to update patient: ' . $e->getMessage(), 500);
         }
-        
-        if (isset($validated['medium_acquisition'])) {
-            $patient->update(['medium_acquisition' => $validated['medium_acquisition']]);
-        }
-
-        return ApiResponse::success($patient->load('user'), 'Patient updated successfully');
     }
 
     public function destroy($id) {
@@ -110,9 +140,21 @@ class PatientController extends Controller {
             return ApiResponse::error(null, 'Patient not found', 404);
         }
 
-        $patient->user->delete();
-        $patient->delete();
-
-        return ApiResponse::success(null, 'Patient deleted successfully');
+        try {
+            \DB::transaction(function() use ($patient) {
+                $user = $patient->user;
+                if ($user) {
+                    $user->delete();
+                }
+                
+                $patient->delete();
+            });
+            
+            return ApiResponse::success(null, 'Patient deleted successfully');
+            
+        } catch (\Exception $e) {
+            \Log::error('Failed to delete patient: ' . $e->getMessage());
+            return ApiResponse::error(null, 'Failed to delete patient: ' . $e->getMessage(), 500);
+        }
     }
 }
