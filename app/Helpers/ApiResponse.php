@@ -26,7 +26,6 @@ class ApiResponse
     public static function validation($errors)
     {
         return response()->json([
-            'success' => false,
             'message' => 'Validation error',
             'errors' => $errors
         ], 422);

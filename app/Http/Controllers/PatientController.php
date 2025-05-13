@@ -10,11 +10,17 @@ use App\Helpers\ApiResponse;
 
 class PatientController extends Controller {
     public function index() {
-        return ApiResponse::success(Patient::with('user')->get());
+        $patients = Patient::with('user')->get();
+
+        if ($patients->isEmpty()) {
+            return ApiResponse::success($patients, 'No patient found');
+        }
+
+        return ApiResponse::success($patients);
     }
 
     public function store(Request $request) {
-        $validated = Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'id_type' => 'required|string',
             'id_no' => 'required|string',
@@ -22,41 +28,88 @@ class PatientController extends Controller {
             'dob' => 'required|date',
             'address' => 'required|string',
             'medium_acquisition' => 'required|string',
-        ])->validate();
+        ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::validation($validator->errors());
+        }
+
+        $validated = $validator->validated();
 
         $user = User::create([
-            'name' => $request->name,
-            'id_type' => $request->id_type,
-            'id_no' => $request->id_no,
-            'gender' => $request->gender,
-            'dob' => $request->dob,
-            'address' => $request->address,
+            'name' => $validated['name'],
+            'id_type' => $validated['id_type'],
+            'id_no' => $validated['id_no'],
+            'gender' => $validated['gender'],
+            'dob' => $validated['dob'],
+            'address' => $validated['address'],
         ]);
 
         $patient = Patient::create([
             'user_id' => $user->id,
-            'medium_acquisition' => $request->medium_acquisition
+            'medium_acquisition' => $validated['medium_acquisition'],
         ]);
 
         return ApiResponse::success($patient->load('user'), 'Patient created successfully', 201);
     }
 
     public function show($id) {
-        return ApiResponse::success(Patient::with('user')->findOrFail($id));
+        $patient = Patient::with('user')->findOrFail($id);
+
+        if (!$patient) {
+            return ApiResponse::error(null, 'Patient not found', 404);
+        }
+
+        return ApiResponse::success($patient);
     }
 
     public function update(Request $request, $id) {
         $patient = Patient::findOrFail($id);
+        if (!$patient) {
+            return ApiResponse::error(null, 'Patient not found', 404);
+        }
         $user = $patient->user;
 
-        $user->update($request->only(['name', 'id_type', 'id_no', 'gender', 'dob', 'address']));
-        $patient->update($request->only(['medium_acquisition']));
+        if (!$user) {
+            return ApiResponse::error(null, 'User not found', 404);
+        }
+
+$validator = Validator::make($request->all(), [
+            'name' => 'sometimes|required|string',
+            'id_type' => 'sometimes|required|string',
+            'id_no' => 'sometimes|required|string',
+            'gender' => 'sometimes|required|string',
+            'dob' => 'sometimes|required|date',
+            'address' => 'sometimes|required|string',
+            'medium_acquisition' => 'sometimes|required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return ApiResponse::validation($validator->errors());
+        }
+
+        $validated = $validator->validated();
+
+        if (isset($validated['name']) || isset($validated['id_type']) || 
+            isset($validated['id_no']) || isset($validated['gender']) || 
+            isset($validated['dob']) || isset($validated['address'])) {
+            $user->update(array_intersect_key($validated, array_flip(['name', 'id_type', 'id_no', 'gender', 'dob', 'address'])));
+        }
+        
+        if (isset($validated['medium_acquisition'])) {
+            $patient->update(['medium_acquisition' => $validated['medium_acquisition']]);
+        }
 
         return ApiResponse::success($patient->load('user'), 'Patient updated successfully');
     }
 
     public function destroy($id) {
         $patient = Patient::findOrFail($id);
+
+        if(!$patient) {
+            return ApiResponse::error(null, 'Patient not found', 404);
+        }
+
         $patient->user->delete();
         $patient->delete();
 
