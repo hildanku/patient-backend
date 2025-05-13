@@ -11,15 +11,15 @@ Test Question For Backend Laravel
 7. Create API Get List Patient (DONE)
 8. Create API Get Detail Patient (DONE)
 9. The API must be secured with accessKey, no need to login but each API CRUD patient request needs to include those accessKey in the headers (DONE)
-11. Create the API Documentation (WIP)
+11. Create the API Documentation (IN PROGRESS)
 10. Deploy those backend to any cloud or server
 
 EXTEND FEATURE:
 - make response is consistent (DONE)
-- handle edge case Patients bussines logic (WIP2)
+- handle edge case Patients bussines logic (DONE)
 - implement DB Transaction to make db operations is more secure (WIP3)
 - docker env for dev
-- 
+- pagination
 
 We need only : the url, api documentation, and link to your git repository (make sure the repo is set to public so we can access)
 
