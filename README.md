@@ -1,61 +1,295 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PhysioMobile - Patient Service
+A Laravel-based RESTful API for managing patient data with secure access control.
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Tech Stack
+- **Framework**: Laravel 12 (PHP 8.2)
+- **DBMS**: MySQL (8.0.30) 
 
-## About Laravel
+## Requirements
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- PHP 8.2+
+- Laravel 12
+- Composer
+- MySQL
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Installation
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+1. Clone the repository:
+```bash
+git clone https://github.com/hildanku/patient-backend.git
 
-## Learning Laravel
+cd patient-management-api
+```
+2. Install dependencies:
+```bash
+composer install
+```
+3. Set up environment variables:
+```bash 
+cp .env.example .env
+php artisan key:generate
+```
+4. Configure your database in the .env file:
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=patient_management
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+5. Set up your access key for API authentication:
+```
+ACCESS_KEY=your_secure_access_key_here
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+6. Run migrations:
+```bash
+php artisan migrate
+```
+7. Start the development server:
+```bash
+php artisan serve
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Important Notes
+All endpoints require the following headers:
+```
+accessKey: <ACCESS_KEY_IN_ENV> 
+# or by default if you copy .env.example to .env the value accessKey is physiomobile!
+```
 
-## Laravel Sponsors
+## API Endpoints
+### Get All Patients
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+```
+URL: /api/patients
+Method: GET
+Headers: 
+    accessKey: your_secure_access_key_here
+```
+Success Response:
+```json
+{
+  "message": "Success",
+  "data": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "medium_acquisition": "mobile",
+      "created_at": "2023-05-13T10:30:00.000000Z",
+      "updated_at": "2023-05-13T10:30:00.000000Z",
+      "user": {
+        "id": 1,
+        "name": "Lorem Ipsum",
+        "id_type": "KTP",
+        "id_no": "330000000000000000",
+        "gender": "male",
+        "dob": "1990-01-01",
+        "address": "Jl. Lorem Ipsum Dolor Sit Amet",
+        "created_at": "2023-05-13T10:30:00.000000Z",
+        "updated_at": "2023-05-13T10:30:00.000000Z"
+      }
+    }
+  ]
+}
+```
+Empty Response:
+```json
+{
+  "message": "No patient found",
+  "data": []
+}
+```
+---
+### Create Patient
 
-### Premium Partners
+```
+URL: /api/patients
+Method: POST
+Headers: 
+    accessKey: your_secure_access_key_here
+    Content-Type: application/json
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
+Body:
+```json
+{
+  "name": "Lorem Ipsum",
+  "id_type": "KTP",
+  "id_no": "333000000000000000",
+  "gender": "male",
+  "dob": "1990-01-01",
+  "address": "Jl. Lorem Ipsum Dolor Sit Amet",
+  "medium_acquisition": "mobile"
+}
+```
 
-## Contributing
+Success Response (201 Created):
+```json
+{
+  "message": "Patient created successfully",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "medium_acquisition": "mobile",
+    "created_at": "2023-05-13T10:30:00.000000Z",
+    "updated_at": "2023-05-13T10:30:00.000000Z",
+    "user": {
+      "id": 1,
+      "name": "Lorem Ipsum",
+      "id_type": "KTP",
+      "id_no": "3300000000000000",
+      "gender": "male",
+      "dob": "1990-01-01",
+      "address": "Jl. Lorem Ipsum Dolor Sit Amet",
+      "created_at": "2023-05-13T10:30:00.000000Z",
+      "updated_at": "2023-05-13T10:30:00.000000Z"
+    }
+  }
+}
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Validation Error Response (422 Unprocessable Entity):
 
-## Code of Conduct
+```json
+{
+  "message": "Validation error",
+  "errors": {
+    "name": ["The name field must be a string."],
+    "id_type": ["The id type field is required."]
+  }
+}
+```
+---
+### Get Patient Details
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+URL: /api/patients/{id}
+Method: GET
+Headers: 
+    accessKey: your_secure_access_key_here
+```
 
-## Security Vulnerabilities
+Success Response:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```json
+{
+  "message": "Success",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "medium_acquisition": "mobile",
+    "created_at": "2023-05-13T10:30:00.000000Z",
+    "updated_at": "2023-05-13T10:30:00.000000Z",
+    "user": {
+      "id": 1,
+      "name": "Lorem Ipsum",
+      "id_type": "KTP",
+      "id_no": "33300000000000000",
+      "gender": "male",
+      "dob": "1990-01-01",
+      "address": "Jl. Lorem Ipsum Dolor Sit Amet",
+      "created_at": "2023-05-13T10:30:00.000000Z",
+      "updated_at": "2023-05-13T10:30:00.000000Z"
+    }
+  }
+}
+```
 
-## License
+Not Found Response (404 Not Found):
+```json
+{
+  "message": "Patient not found",
+  "data": null
+}
+```
+---
+### Update Patient
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```
+URL: /api/patients/{id}
+Method: PUT
+Headers: 
+    accessKey: your_secure_access_key_here
+    Content-Type: application/json
+```
+Body (partial updates supported):
+```json
+{
+  "name": "Ipsum Lorem",
+  "address": "Jl. Ipsum Dolor Sit Amet",
+  "medium_acquisition": "website"
+}
+```
+Success Response:
+```json
+{
+  "message": "Patient updated successfully",
+  "data": {
+    "id": 1,
+    "user_id": 1,
+    "medium_acquisition": "website",
+    "created_at": "2023-05-13T10:30:00.000000Z",
+    "updated_at": "2023-05-13T11:45:00.000000Z",
+    "user": {
+      "id": 1,
+      "name": "Ipsum Lorem",
+      "id_type": "passport",
+      "id_no": "AB123456",
+      "gender": "male",
+      "dob": "1990-01-01",
+      "address": "Jl. Ipsum Dolor Sit Amet",
+      "created_at": "2023-05-13T10:30:00.000000Z",
+      "updated_at": "2023-05-13T11:45:00.000000Z"
+    }
+  }
+}
+```
+
+Validation Error Response (422 Unprocessable Entity):
+```json
+{
+  "message": "Validation error",
+  "errors": {
+    "name": ["The name field must be a string."]
+  }
+}
+```
+Not Found Response (404 Not Found):
+```json
+{
+  "message": "Patient not found",
+  "data": null
+}
+```
+
+### Delete Patient
+
+```
+URL: /api/patients/{id}
+Method: DELETE
+Headers: 
+    accessKey: your_secure_access_key_here
+```
+Success Response:
+```json
+{
+  "message": "Patient deleted successfully",
+  "data": null
+}
+```
+Not Found Response (404 Not Found):
+```json
+{
+  "message": "Patient not found",
+  "data": null
+}
+```
+
+## Important Implementation Details
+
+1. Access Control: All API endpoints are protected by the HasAccessKey middleware which verifies the accessKey header.
+2. Data Validation: Proper validation is implemented for all user inputs using Laravel's validation system.
+3. Consistent JSON Responses: The system ensures consistent JSON responses even for error cases, avoiding HTML error responses.
