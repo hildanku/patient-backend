@@ -18,7 +18,7 @@ A Laravel-based RESTful API for managing patient data with secure access control
 ```bash
 git clone https://github.com/hildanku/patient-backend.git
 
-cd patient-management-api
+cd patient-backend
 ```
 2. Install dependencies:
 ```bash
@@ -293,3 +293,4 @@ Not Found Response (404 Not Found):
 1. Access Control: All API endpoints are protected by the HasAccessKey middleware which verifies the accessKey header.
 2. Data Validation: Proper validation is implemented for all user inputs using Laravel's validation system.
 3. Consistent JSON Responses: The system ensures consistent JSON responses even for error cases, avoiding HTML error responses.
+4. Database Transaction: This ensures data consistency, if any step fails during the operation, all changes are automatically rolled back, preventing partial writes and maintaining relational integrity.
