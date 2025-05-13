@@ -1,0 +1,148 @@
+{
+	"info": {
+		"_postman_id": "bf8f3c22-9878-4339-9ae8-84be1cb9b720",
+		"name": "Physio - Patient BE",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25016670",
+		"_collection_link": "https://happifycode-5780.postman.co/workspace/happifycode-Workspace~9fcd1d49-36db-418c-85e6-63434ad82c2a/collection/25016670-bf8f3c22-9878-4339-9ae8-84be1cb9b720?action=share&source=collection_link&creator=25016670"
+	},
+	"item": [
+		{
+			"name": "Get All Patients",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accessKey",
+						"value": "physiomobile!",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/patients",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"patients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Detail Patient",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "accessKey",
+						"value": "physiomobile!",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/patients/8",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"patients",
+						"8"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Patient",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "accessKey",
+						"value": "physiomobile!",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"s\",\r\n    \"id_type\": \"passport\",\r\n    \"id_no\": \"AB123456\",\r\n    \"gender\": \"male\",\r\n    \"dob\": \"1990-01-01\",\r\n    \"address\": \"123 Main St\",\r\n    \"medium_acquisition\": \"website\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/patients",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"patients"
+					]
+				},
+				"description": "### Add Patient\n\nThis endpoint allows the addition of a new patient to the system.\n\n#### Request Body\n\n- `name`: (string) The name of the patient.\n    \n- `id_type`: (string) The type of identification used (e.g., passport, driver's license).\n    \n- `id_no`: (string) The identification number of the patient.\n    \n- `gender`: (string) The gender of the patient.\n    \n- `dob`: (string) The date of birth of the patient.\n    \n- `address`: (string) The address of the patient.\n    \n- `medium_acquisition`: (string) The medium through which the patient was acquired (e.g., website, referral).\n    \n\n#### Response\n\nUpon successful addition, the response will have a status code of 201 and a JSON object with the following structure:\n\n``` json\n{\n    \"message\": \"\",\n    \"data\": {\n        \"user_id\": 0,\n        \"medium_acquisition\": \"\",\n        \"updated_at\": \"\",\n        \"created_at\": \"\",\n        \"id\": 0,\n        \"user\": {\n            \"id\": 0,\n            \"name\": \"\",\n            \"id_type\": \"\",\n            \"id_no\": \"\",\n            \"gender\": \"\",\n            \"dob\": \"\",\n            \"address\": \"\",\n            \"created_at\": \"\",\n            \"updated_at\": \"\"\n        }\n    }\n}\n\n ```"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Patient ( Partial )",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "accessKey",
+						"value": "physiomobile!",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"sssssssssssssssss\",\r\n    \"id_type\": \"ss\",\r\n    \"id_no\": \"sdadasda\",\r\n    \"gender\": \"male\",\r\n    \"dob\": \"1990-01-01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{url}}/patients/5",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"patients",
+						"5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Patient",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "accessKey",
+						"value": "physiomobile!",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{url}}/patients/7",
+					"host": [
+						"{{url}}"
+					],
+					"path": [
+						"patients",
+						"7"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
