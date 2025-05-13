@@ -54,7 +54,7 @@ class PatientController extends Controller {
     }
 
     public function show($id) {
-        $patient = Patient::with('user')->findOrFail($id);
+        $patient = Patient::with('user')->find($id);
 
         if (!$patient) {
             return ApiResponse::error(null, 'Patient not found', 404);
@@ -64,7 +64,7 @@ class PatientController extends Controller {
     }
 
     public function update(Request $request, $id) {
-        $patient = Patient::findOrFail($id);
+        $patient = Patient::find($id);
         if (!$patient) {
             return ApiResponse::error(null, 'Patient not found', 404);
         }
@@ -74,7 +74,7 @@ class PatientController extends Controller {
             return ApiResponse::error(null, 'User not found', 404);
         }
 
-$validator = Validator::make($request->all(), [
+    $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string',
             'id_type' => 'sometimes|required|string',
             'id_no' => 'sometimes|required|string',
@@ -104,7 +104,7 @@ $validator = Validator::make($request->all(), [
     }
 
     public function destroy($id) {
-        $patient = Patient::findOrFail($id);
+        $patient = Patient::find($id);
 
         if(!$patient) {
             return ApiResponse::error(null, 'Patient not found', 404);
